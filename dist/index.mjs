@@ -1,0 +1,1 @@
+import*as o from"@hapi/hapi";const e=r=>{r.route({method:"GET",path:"/ping",handler:async(s,c)=>({ok:!0})})},t=()=>{const r=o.server({host:"localhost",port:3e3});return e(r),r},n=async()=>{const r=t();return await r.start(),console.log(`Server running on ${r.info.uri}`),r};process.on("unhandledRejection",r=>{console.error(r),process.exit(1)}),n();
