@@ -5,6 +5,5 @@
     "strict": true,
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*", "tests/**/*"]
+  "include": ["src/**/*", "tests/**/*", "src/types/**/*.d.ts"]
 }
-
