@@ -1,5 +1,5 @@
 
-type wrapped<T> =
+export type wrapped<T> =
   | {
     value: T,
     error: null,
@@ -11,7 +11,7 @@ type wrapped<T> =
     raw_throw: unknown,
   }
 
-async function async_unwrap<T>(promise: Promise<T>): Promise<wrapped<T>> {
+export async function async_unwrap<T>(promise: Promise<T>): Promise<wrapped<T>> {
   try {
     const result = await promise
 
@@ -34,7 +34,7 @@ async function async_unwrap<T>(promise: Promise<T>): Promise<wrapped<T>> {
   }
 }
 
-function unwrap<T>(protected_call: () => T): wrapped<T> {
+export function unwrap<T>(protected_call: () => T): wrapped<T> {
   try {
     const result = protected_call()
     return {

@@ -1,11 +1,16 @@
 import { defineConfig } from 'rollup';
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import esbuild from 'rollup-plugin-esbuild';
-import run from '@rollup/plugin-run';
-import json from '@rollup/plugin-json';
+import rollup_resolve from '@rollup/plugin-node-resolve';
+import rollup_commonjs from '@rollup/plugin-commonjs';
+import rollup_esbuild from 'rollup-plugin-esbuild';
+import rollup_dts from 'rollup-plugin-dts';
+import rollup_json from '@rollup/plugin-json';
+import rollup_alias from '@rollup/plugin-alias'
+import rollup_run from '@rollup/plugin-run'
 
 import node_module from 'node:module'
+import path from 'node:path';
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const require = node_module.createRequire(import.meta.url)
 const package_json = require('./package.json')
@@ -17,19 +22,31 @@ const external = [
 ];
 
 export default defineConfig({
-  input: 'src/index.ts',
+  input: './src/index.ts',
   external,
   plugins: [
-    json(),
-    resolve({ preferBuiltins: true }),
-    commonjs(),
-    esbuild({ target: ['node22', 'es2024'], tsconfig: 'tsconfig.json' }),
-    run()
+    rollup_json(),
+    rollup_alias({
+      entries: [
+        { find: /^~\//, replacement: `${path.resolve(__dirname)}/` },
+        { find: /^@\//, replacement: `${path.resolve(__dirname, 'src')}/` },
+      ]
+    }),
+    rollup_resolve({
+      preferBuiltins: true,
+      extensions: ['.ts', '.js', '.mjs'],
+    }),
+    rollup_esbuild({ target: ['node22', 'ES2022'], tsconfig: './tsconfig.json' }),
+    rollup_run(),
   ],
-  output: { file: 'dist/dev.cjs', format: 'cjs' },
+  output: {
+    file: 'dist/dev.mjs',
+    format: 'esm',
+    sourcemap: true,
+  },
   watch: {
     clearScreen: true,
-    exclude: ['dist/**']
-  }
+    exclude: ['dist/**', 'dist', './dist']
+  },
 });
 

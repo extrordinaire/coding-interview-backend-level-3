@@ -4,8 +4,14 @@ import rollup_commonjs from '@rollup/plugin-commonjs';
 import rollup_esbuild from 'rollup-plugin-esbuild';
 import rollup_dts from 'rollup-plugin-dts';
 import rollup_json from '@rollup/plugin-json';
+import rollup_alias from '@rollup/plugin-alias'
 
 import node_module from 'node:module'
+import path from 'node:path';
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
+console.log(__dirname)
 
 const require = node_module.createRequire(import.meta.url)
 const package_json = require('./package.json')
@@ -22,6 +28,18 @@ export default defineConfig([
     external,
     treeshake: { moduleSideEffects: false },
     plugins: [
+      rollup_alias({
+        entries: [
+          {
+            find: '~/',
+            replacement: path.resolve(__dirname, ''),
+          },
+          {
+            find: '@/',
+            replacement: path.resolve(__dirname, 'src'),
+          },
+        ],
+      }),
       rollup_json(),
       rollup_resolve({ preferBuiltins: true }),
       rollup_commonjs(),

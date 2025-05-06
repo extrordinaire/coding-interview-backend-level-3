@@ -1,29 +1,20 @@
 import { ServerValidator, Validator } from "@hapi/hapi"
-import { badData as Boom_badData } from "@hapi/boom"
+import { Boom, badData as boom_bad_data } from "@hapi/boom"
 
 import { z, ZodMiniType } from "@zod/mini"
 
-const zod_adapter: ServerValidator = {
-  compile: <S>(schema: z.ZodMiniType<S>) => schema,
-  // (optional) provide validate() if you want Hapi to call it:
-  validate: <S>(compiled: z.ZodMiniType<S>, value: unknown) => {
-    const result = compiled.safeParse(value);
-    if (!result.success) {
-      // Throwing a Boom error signals HTTP 400 Bad Request
-      throw Boom_badData('Invalid request payload input');
-    }
-    return { value: result.data };
+export const zod_adapter: ServerValidator = {
+  compile: <A>(schema: z.ZodMiniType<unknown, A>) => {
+    return zod_validator<A>(schema, boom_bad_data('Invalid Data Shape'))
   }
 }
 
-const zod_validator: <A>(schema: ZodMiniType<any, A>) => Validator<A> = (schema) => async (value, _) => {
+export const zod_validator: <A>(schema: ZodMiniType<unknown, A>, boom?: Boom<unknown>) => Validator<A> = (schema, boom) => async (value, _) => {
   const { data: parsed_data, error: parse_error } = schema.safeParse(value);
 
   if (parse_error) {
-    throw Boom_badData('Invalid request payload input')
+    throw boom || boom_bad_data()
   }
 
   return parsed_data
 }
-
-export { zod_adapter, zod_validator }

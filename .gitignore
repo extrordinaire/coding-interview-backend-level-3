@@ -2,3 +2,4 @@ node_modules
 mock.ts
 
 .supabase
+.pocket-base
